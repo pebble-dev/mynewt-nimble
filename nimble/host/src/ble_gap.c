@@ -25,6 +25,9 @@
 #include "host/ble_hs_adv.h"
 #include "host/ble_hs_hci.h"
 #include "ble_hs_priv.h"
+#if MYNEWT_VAL(BLE_HOST_RPA_RESOLVER)
+#include "ble_hs_resolve_priv.h"
+#endif
 #include "ble_gap_priv.h"
 
 #ifndef min
@@ -2112,6 +2115,10 @@ ble_gap_rx_conn_complete(struct ble_gap_conn_complete *evt, uint8_t instance)
 #endif
         ble_gap_slave_reset_state(instance);
     }
+
+#if MYNEWT_VAL(BLE_HOST_RPA_RESOLVER)
+    ble_hs_resolve_update_peer_id_addr(evt->peer_addr, &evt->peer_addr_type, evt->peer_rpa);
+#endif
 
     conn->bhc_peer_addr.type = evt->peer_addr_type;
     memcpy(conn->bhc_peer_addr.val, evt->peer_addr, 6);

@@ -52,6 +52,10 @@ ble_hs_pvcy_set_resolve_enabled(int enable)
 {
     struct ble_hci_le_set_addr_res_en_cp cmd;
 
+#if MYNEWT_VAL(BLE_HOST_RPA_RESOLVER)
+    return 0;
+#endif
+
     cmd.enable = enable;
 
     return ble_hs_hci_cmd_tx(BLE_HCI_OP(BLE_HCI_OGF_LE,
@@ -80,6 +84,10 @@ int
 ble_hs_pvcy_remove_entry(uint8_t addr_type, const uint8_t *addr)
 {
     int rc;
+
+#if MYNEWT_VAL(BLE_HOST_RPA_RESOLVER)
+    return 0;
+#endif
 
     /* Need to preempt all GAP procedures (advertising, pending connections)
      * before modifying resolving list in the controller
@@ -143,6 +151,10 @@ ble_hs_pvcy_add_entry(const uint8_t *addr, uint8_t addr_type,
                       const uint8_t *irk)
 {
     int rc;
+
+#if MYNEWT_VAL(BLE_HOST_RPA_RESOLVER)
+    return 0;
+#endif
 
     STATS_INC(ble_hs_stats, pvcy_add_entry);
 

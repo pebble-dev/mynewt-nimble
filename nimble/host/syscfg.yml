@@ -428,6 +428,12 @@ syscfg.defs:
             The rate that new random addresses should be generated (seconds).
         value: 300
 
+    BLE_HOST_RPA_RESOLVER:
+        description: >
+            Enables resolving RPAs on the host, rather than the controller.
+            This is useful when the controller does not support RPA resolution.
+        value: 0
+
     # Store settings.
     BLE_STORE_MAX_BONDS:
         description: >

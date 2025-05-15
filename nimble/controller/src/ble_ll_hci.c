@@ -909,6 +909,7 @@ ble_ll_hci_le_cmd_proc(const uint8_t *cmdbuf, uint8_t len, uint16_t ocf,
     /* Assume error; if all pass rc gets set to 0 */
     rc = BLE_ERR_INV_HCI_CMD_PARMS;
 
+
 #if MYNEWT_VAL(BLE_LL_CFG_FEAT_LL_EXT_ADV)
     if (!ble_ll_is_valid_adv_mode(ocf)) {
         rc = BLE_ERR_CMD_DISALLOWED;
@@ -1825,6 +1826,9 @@ ble_ll_hci_cmd_proc(struct ble_npl_event *ev)
     ocf = BLE_HCI_OCF(opcode);
     ogf = BLE_HCI_OGF(opcode);
 
+extern bool ble_is_on_fire;
+if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_hci_cmd_proc: len %d, opcode %04x", cmd->length, opcode);
+
     /*
      * The command response pointer points into the same buffer as the
      * command data itself. That is fine, as each command reads all the data
@@ -1975,6 +1979,7 @@ ble_ll_hci_cmd_rx(uint8_t *cmdbuf)
     /* Get an event structure off the queue */
     ev = &g_ble_ll_hci_cmd_ev;
     if (ble_npl_event_is_queued(ev)) {
+PBL_LOG(LOG_LEVEL_ERROR, "LL OOM!");
         return BLE_ERR_MEM_CAPACITY;
     }
 

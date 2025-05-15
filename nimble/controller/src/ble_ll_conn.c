@@ -57,6 +57,15 @@ extern void bletest_completed_pkt(uint16_t handle);
 struct ble_ll_conn_sm *g_ble_ll_conn_css_ref;
 #endif
 
+extern void little_trace_void(uint32_t evt);
+extern void little_trace_u32x2(uint32_t evt, uint32_t a, uint32_t b);
+#define TR_CONN_EVENT_END 10000
+#define TR_CONN_EVENT_START_CB 10001
+#define TR_CONN_RX 10002
+#define TR_CONN_TX 10003
+#define TR_CONN_RX_CRC_BAD 10004
+#define TR_CONN_RX_XMIT_REPLY 10005
+
 /* XXX TODO
  * 1) I think if we are initiating and we already have a connection with
  * a device that we will still try and connect to it. Fix this.
@@ -1193,6 +1202,8 @@ ble_ll_conn_tx_pdu(struct ble_ll_conn_sm *connsm)
         /* NOTE: header was set when first enqueued */
         hdr_byte = ble_hdr->txinfo.hdr_byte;
         connsm->cur_tx_pdu = m;
+        extern bool ble_is_on_fire;
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_tx_pdu tx new PDU");
     } else {
         nextpkthdr = pkthdr;
         if (connsm->cur_tx_pdu) {
@@ -1215,6 +1226,8 @@ ble_ll_conn_tx_pdu(struct ble_ll_conn_sm *connsm)
                 }
             }
 #endif
+        extern bool ble_is_on_fire;
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_tx_pdu tx continuation PDU");
         } else {
             /* Empty PDU here. NOTE: header byte gets set later */
             pktlen = 0;
@@ -1227,6 +1240,9 @@ ble_ll_conn_tx_pdu(struct ble_ll_conn_sm *connsm)
                 }
             }
 #endif
+        extern bool ble_is_on_fire;
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_tx_pdu tx empty PDU");
+
         }
     }
 
@@ -1441,7 +1457,7 @@ conn_tx_pdu:
     if (!rc) {
         /* Log transmit on connection state */
         cur_txlen = ble_hdr->txinfo.pyld_len;
-        ble_ll_trace_u32x2(BLE_LL_TRACE_ID_CONN_TX, cur_txlen,
+        little_trace_u32x2(TR_CONN_TX, cur_txlen,
                            ble_hdr->txinfo.offset);
 
         /* Set last transmitted MD bit */
@@ -1488,6 +1504,8 @@ ble_ll_conn_event_start_cb(struct ble_ll_sched_item *sch)
 #endif
     uint32_t start;
     struct ble_ll_conn_sm *connsm;
+    
+    little_trace_void(TR_CONN_EVENT_START_CB);
 
     /* XXX: note that we can extend end time here if we want. Look at this */
 
@@ -2931,7 +2949,7 @@ ble_ll_conn_event_end(struct ble_npl_event *ev)
     uint8_t ble_err;
     uint32_t tmo;
     struct ble_ll_conn_sm *connsm;
-
+    
     ble_ll_rfmgmt_release();
 
     /* Better be a connection state machine! */
@@ -2939,7 +2957,7 @@ ble_ll_conn_event_end(struct ble_npl_event *ev)
     BLE_LL_ASSERT(connsm);
 
     /* Log event end */
-    ble_ll_trace_u32x2(BLE_LL_TRACE_ID_CONN_EV_END, connsm->conn_handle,
+    little_trace_u32x2(TR_CONN_EVENT_END, connsm->conn_handle,
                        connsm->event_cntr);
 
     ble_ll_scan_chk_resume();
@@ -3681,6 +3699,10 @@ ble_ll_conn_rx_isr_end(uint8_t *rxbuf, struct ble_mbuf_hdr *rxhdr)
         alloc_rxpdu = false;
     }
 
+    extern bool ble_is_on_fire;
+    if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_rx_isr_end, hdr_byte %02x, alloc_rxpdu %d", hdr_byte, alloc_rxpdu);
+
+
 #if MYNEWT_PKG_apache_mynewt_nimble__nimble_transport_common_hci_ipc
     /* If IPC transport is used, make sure there is buffer available on app side
      * for this PDU. We'll just nak in LL if there are no free buffers.
@@ -3765,6 +3787,8 @@ ble_ll_conn_rx_isr_end(uint8_t *rxbuf, struct ble_mbuf_hdr *rxhdr)
          */
         ++connsm->cons_rxd_bad_crc;
         reply = connsm->cons_rxd_bad_crc < 2;
+
+        little_trace_u32x2(TR_CONN_RX_CRC_BAD, connsm->tx_seqnum, 0);
     } else {
         /* Reset consecutively received bad crcs (since this one was good!) */
         connsm->cons_rxd_bad_crc = 0;
@@ -3794,7 +3818,7 @@ ble_ll_conn_rx_isr_end(uint8_t *rxbuf, struct ble_mbuf_hdr *rxhdr)
 #endif
         }
 
-        ble_ll_trace_u32x2(BLE_LL_TRACE_ID_CONN_RX, connsm->tx_seqnum,
+        little_trace_u32x2(TR_CONN_RX, connsm->tx_seqnum,
                            !!(hdr_byte & BLE_LL_DATA_HDR_NESN_MASK));
 
         /*
@@ -3807,6 +3831,8 @@ ble_ll_conn_rx_isr_end(uint8_t *rxbuf, struct ble_mbuf_hdr *rxhdr)
             if ((hdr_nesn && conn_sn) || (!hdr_nesn && !conn_sn)) {
                 /* We did not get an ACK. Must retry the PDU */
                 STATS_INC(ble_ll_conn_stats, data_pdu_txf);
+                extern bool ble_is_on_fire;
+                if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_rx_isr_end NAK, retry PDU");
             } else {
                 /* Transmit success */
                 connsm->tx_seqnum ^= 1;
@@ -3914,6 +3940,7 @@ chk_rx_terminate_ind:
         rx_pyld_len += BLE_LL_DATA_MIC_LEN;
     }
     if (reply && ble_ll_conn_can_send_next_pdu(connsm, begtime, add_usecs)) {
+        little_trace_void(TR_CONN_RX_XMIT_REPLY);
         rc = ble_ll_conn_tx_pdu(connsm);
     }
 
@@ -4052,7 +4079,14 @@ ble_ll_conn_enqueue_pkt(struct ble_ll_conn_sm *connsm, struct os_mbuf *om,
         STAILQ_INSERT_TAIL(&connsm->conn_txq, pkthdr, omp_next);
     }
     connsm->conn_txq_num_data_pkt += num_pkt;
+    int pkts = 0;
+    struct os_mbuf_pkthdr *pkt;
+    STAILQ_FOREACH(pkt, &connsm->conn_txq, omp_next) {
+        pkts++;
+    }
     OS_EXIT_CRITICAL(sr);
+    extern bool ble_is_on_fire;
+    if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_enqueue_pkt did its job, %d conn_txq_num_data_pkt, %d in queue", connsm->conn_txq_num_data_pkt, pkts);
 }
 
 /**
@@ -4090,10 +4124,14 @@ ble_ll_conn_tx_pkt_in(struct os_mbuf *om, uint16_t handle, uint16_t length)
         STATS_INC(ble_ll_conn_stats, l2cap_enqueued);
 
         /* Clear flags field in BLE header */
+        extern bool ble_is_on_fire;
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_tx_pkt_in enqueuing");
         ble_ll_conn_enqueue_pkt(connsm, om, hdr_byte, length);
     } else {
         /* No connection found! */
         STATS_INC(ble_ll_conn_stats, handle_not_found);
+        extern bool ble_is_on_fire;
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_conn_tx_pkt_in no connection found");
         os_mbuf_free_chain(om);
     }
 }

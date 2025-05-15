@@ -442,6 +442,8 @@ err:
     return rc;
 }
 
+extern bool ble_is_on_fire;
+
 /**
  * Transmits the L2CAP payload contained in the specified mbuf.  The supplied
  * mbuf is consumed, regardless of the outcome of the function call.
@@ -459,6 +461,7 @@ ble_l2cap_tx(struct ble_hs_conn *conn, struct ble_l2cap_chan *chan,
 
     txom = ble_l2cap_prepend_hdr(txom, chan->dcid, OS_MBUF_PKTLEN(txom));
     if (txom == NULL) {
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ENOMEM on l2cap_prepend_hdr");
         return BLE_HS_ENOMEM;
     }
 
@@ -466,15 +469,18 @@ ble_l2cap_tx(struct ble_hs_conn *conn, struct ble_l2cap_chan *chan,
     switch (rc) {
     case 0:
         /* Success. */
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "controller gleefully transmitted bytes");
         return 0;
 
     case BLE_HS_EAGAIN:
         /* Controller could not accommodate full packet.  Enqueue remainder. */
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "EAGAIN from controller");
         STAILQ_INSERT_TAIL(&conn->bhc_tx_q, OS_MBUF_PKTHDR(txom), omp_next);
         return 0;
 
     default:
         /* Error. */
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "other return code %d from controller", rc);
         return rc;
     }
 }

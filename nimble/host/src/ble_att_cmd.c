@@ -58,6 +58,8 @@ ble_att_cmd_get(uint8_t opcode, size_t len, struct os_mbuf **txom)
     return ble_att_cmd_prepare(opcode, len, *txom);
 }
 
+extern bool ble_is_on_fire;
+
 int
 ble_att_tx_with_conn(struct ble_hs_conn *conn, struct ble_l2cap_chan *chan, struct os_mbuf *txom)
 {
@@ -66,11 +68,13 @@ ble_att_tx_with_conn(struct ble_hs_conn *conn, struct ble_l2cap_chan *chan, stru
 
     if (!txom) {
         if (conn->client_att_busy) {
+            if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_att_tx_with_conn: conn->client_att_busy");
             return 0;
         }
         omp = STAILQ_FIRST(&conn->att_tx_q);
         if (omp == NULL) {
             BLE_EATT_LOG_ERROR("%s: wakeup but nothing in the queue\n", __func__);
+            if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_att_tx_with_conn: wakeup but nothing is in the queue");
             return 0;
         }
         STAILQ_REMOVE_HEAD(&conn->att_tx_q, omp_next);
@@ -84,15 +88,18 @@ ble_att_tx_with_conn(struct ble_hs_conn *conn, struct ble_l2cap_chan *chan, stru
         if (conn->client_att_busy) {
             BLE_EATT_LOG_DEBUG("ATT Queue %p, client busy %d\n", txom, conn->client_att_busy);
             STAILQ_INSERT_TAIL(&conn->att_tx_q, OS_MBUF_PKTHDR(txom), omp_next);
+            if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_att_tx_with_conn: client_att_busy, come back later");
             return 0;
         }
         conn->client_att_busy = true;
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_att_tx_with_conn: client_att becoming busy");
     }
 
     ble_att_inc_tx_stat(txom->om_data[0]);
 
     ble_att_truncate_to_mtu(chan, txom);
     rc = ble_l2cap_tx(conn, chan, txom);
+    if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_att_tx_with_conn: ok, just handing it to L2CAP, rc = %d", rc);
     assert(rc == 0);
     return rc;
 }

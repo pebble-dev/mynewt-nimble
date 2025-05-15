@@ -74,6 +74,76 @@ extern void tm_tick(void);
 
 #include <controller/ble_ll_pdu.h>
 
+#define ble_phy_trace_u32x2 little_trace_u32x2
+#define ble_phy_trace_void little_trace_void
+
+#define TR_RX_SET_START_TIME 2001
+#define TR_RX_START_ISR      2002
+#define TR_RX_END_ISR        2003
+
+#define TR_TX_SET_START_TIME  1001
+#define TR_TX_START_ISR       1002
+#define TR_TX_END_ISR         1003
+#define TR_TX_LATE            1004
+#define TR_TX_START_OK        1005
+#define TR_TX_START_BAD       1006
+
+#define TR_PHY_SET_START_TIME 3001
+#define TR_PHY_SET_START_NOW  3002
+#define TR_PHY_ISR            3003
+
+#define TRACELEN 128
+
+int tracebuf_p = 0;
+uint32_t tracebuf[TRACELEN][4];
+
+void little_trace_u32x2(uint32_t a, uint32_t b, uint32_t c) {
+    tracebuf[tracebuf_p][0] = NRF_RTC0->COUNTER;
+    tracebuf[tracebuf_p][1] = a;
+    tracebuf[tracebuf_p][2] = b;
+    tracebuf[tracebuf_p][3] = c;
+    tracebuf_p = (tracebuf_p + 1) % TRACELEN;
+}
+
+void little_trace_void(uint32_t a) {
+    tracebuf[tracebuf_p][0] = NRF_RTC0->COUNTER;
+    tracebuf[tracebuf_p][1] = a;
+    tracebuf[tracebuf_p][2] = 0;
+    tracebuf[tracebuf_p][3] = 0;
+    tracebuf_p = (tracebuf_p + 1) % TRACELEN;
+}
+
+void print_tracebuf() {
+    static int did_print = 0;
+    if (did_print++) return;
+    for (int i = 0; i < TRACELEN; i++) {
+        const char *s = 
+            tracebuf[i][1] == TR_RX_SET_START_TIME ? "TR_RX_SET_START_TIME" :
+            tracebuf[i][1] == TR_RX_START_ISR ? "TR_RX_START_ISR" :
+            tracebuf[i][1] == TR_RX_END_ISR ? "TR_RX_END_ISR" :
+            tracebuf[i][1] == TR_TX_SET_START_TIME ? "TR_TX_SET_START_TIME" :
+            tracebuf[i][1] == TR_TX_START_ISR ? "TR_TX_START_ISR" :
+            tracebuf[i][1] == TR_TX_END_ISR ? "TR_TX_END_ISR" :
+            tracebuf[i][1] == TR_TX_LATE ? "TR_TX_LATE" :
+            tracebuf[i][1] == TR_TX_START_OK ? "TR_TX_START_OK" :
+            tracebuf[i][1] == TR_TX_START_BAD ? "TR_TX_START_BAD" :
+            tracebuf[i][1] == TR_PHY_SET_START_TIME ? "TR_PHY_SET_START_TIME" :
+            tracebuf[i][1] == TR_PHY_SET_START_NOW ? "TR_PHY_SET_START_NOW" :
+            tracebuf[i][1] == TR_PHY_ISR ? "TR_PHY_ISR" :
+            tracebuf[i][1] == 10000 ? "TR_CONN_EVENT_END" :
+            tracebuf[i][1] == 10001 ? "TR_CONN_EVENT_START_CB" :
+            tracebuf[i][1] == 10002 ? "TR_CONN_RX" :
+            tracebuf[i][1] == 10003 ? "TR_CONN_TX" :
+            tracebuf[i][1] == 20000 ? "HAL_OCMP_SET" :
+            tracebuf[i][1] == 20001 ? "HAL_TIMER_ISR" :
+            tracebuf[i][1] == 10004 ? "TR_CONN_RX_CRC_BAD" :
+            tracebuf[i][1] == 10005 ? "TR_CONN_RX_XMIT_REPLY" :
+            "?";
+            
+        PBL_LOG(LOG_LEVEL_ERROR, "TRACEBUF: @%"PRIu32" %s (%"PRIu32") %"PRIu32" %"PRIu32, tracebuf[i][0], s, tracebuf[i][1], tracebuf[i][2], tracebuf[i][3]);
+    }
+}
+
 /*
  * NOTE: This code uses a couple of PPI channels so care should be taken when
  *       using PPI somewhere else.
@@ -635,6 +705,9 @@ ble_phy_set_start_time(uint32_t cputime, uint8_t rem_us, bool tx)
     int rem_us_corr;
     int min_rem_us;
 
+    little_trace_u32x2(TR_PHY_SET_START_TIME, cputime, rem_us);
+
+
     /* Calculate rem_us for radio and FEM enable. The result may be a negative
      * value, but we'll adjust later.
      */
@@ -721,6 +794,7 @@ ble_phy_set_start_time(uint32_t cputime, uint8_t rem_us, bool tx)
     NRF_RTC0->EVENTS_COMPARE[0] = 0;
     nrf_rtc_cc_set(NRF_RTC0, 0, next_cc);
     nrf_rtc_event_enable(NRF_RTC0, RTC_EVTENSET_COMPARE0_Msk);
+    
 
     /* Enable PPI */
 #if PHY_USE_FEM
@@ -741,6 +815,10 @@ ble_phy_set_start_time(uint32_t cputime, uint8_t rem_us, bool tx)
     /* Store the cputime at which we set the RTC */
     g_ble_phy_data.phy_start_cputime = cputime;
 
+    //if ((NRF_RTC0->COUNTER + 2) >= next_cc) {
+        //PBL_LOG(LOG_LEVEL_ERROR, "*** I THINK WE ARE ABOUT TO MISS A RTC TICK, counter is %"PRIu32", next_cc is %"PRIu32", cntr was %"PRIu32" ***", NRF_RTC0->COUNTER, next_cc, cntr);
+    //}
+
     return 0;
 }
 
@@ -753,6 +831,8 @@ ble_phy_set_start_now(void)
 #if PHY_USE_FEM_LNA
     uint32_t fem_rem_us;
 #endif
+
+    little_trace_void(TR_PHY_SET_START_NOW);
 
     OS_ENTER_CRITICAL(sr);
 
@@ -815,6 +895,11 @@ ble_phy_set_start_now(void)
     g_ble_phy_data.phy_start_cputime = now + 3;
 
     OS_EXIT_CRITICAL(sr);
+
+    //if ((NRF_RTC0->COUNTER + 1) >= now + 3) {
+        //PBL_LOG(LOG_LEVEL_ERROR, "*** I THINK WE ARE ABOUT TO MISS A RTC TICK, ble_phy_set_start_now ***");
+    //}
+
 
     return 0;
 }
@@ -1042,6 +1127,8 @@ ble_phy_tx_end_isr(void)
     uint32_t radio_time;
     uint16_t tifs;
 
+    little_trace_void(TR_TX_END_ISR);
+
     /* Store PHY on which we've just transmitted smth */
     tx_phy_mode = g_ble_phy_data.phy_cur_phy_mode;
 
@@ -1210,6 +1297,8 @@ ble_phy_rx_end_isr(void)
     uint16_t tifs;
     struct ble_mbuf_hdr *ble_hdr;
     bool is_late;
+    
+    little_trace_void(TR_RX_END_ISR);
 
     /* Disable automatic RXEN */
     phy_ppi_timer0_compare0_to_radio_rxen_disable();
@@ -1293,8 +1382,10 @@ ble_phy_rx_end_isr(void)
 
     radio_time = tx_time - BLE_PHY_T_TXENFAST;
     nrf_timer_cc_set(NRF_TIMER0, 0, radio_time);
-    NRF_TIMER0->EVENTS_COMPARE[0] = 0;
+    for (int i = 0; i < 900; i++) __asm__ volatile("");
     phy_ppi_timer0_compare0_to_radio_txen_enable();
+    NRF_TIMER0->EVENTS_COMPARE[0] = 0;
+    //for (int i = 0; i < 300; i++) __asm__ volatile("");
 
 #if PHY_USE_FEM_PA
     nrf_timer_cc_set(NRF_TIMER0, 2, fem_time);
@@ -1309,11 +1400,15 @@ ble_phy_rx_end_isr(void)
      * Note: CC[3] is used only for wfr which we do not need here.
      */
     nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_CAPTURE3);
-    is_late = (NRF_TIMER0->CC[3] > radio_time) && !NRF_TIMER0->EVENTS_COMPARE[0];
+    /* XXX FOR JOSHUA LATER: MAKE THIS BE A SIGNED COMPARISON */
+    is_late = (NRF_TIMER0->CC[3] >= radio_time) && !NRF_TIMER0->EVENTS_COMPARE[0];
 #if PHY_USE_FEM_PA
     is_late = is_late ||
               ((NRF_TIMER0->CC[3] > fem_time) && !NRF_TIMER0->EVENTS_COMPARE[2]);
 #endif
+    little_trace_u32x2(TR_RX_END_ISR, radio_time, NRF_TIMER0->CC[3]);
+
+
     if (is_late) {
         phy_ppi_timer0_compare0_to_radio_txen_disable();
         g_ble_phy_data.phy_transition_late = 1;
@@ -1345,6 +1440,9 @@ ble_phy_rx_start_isr(void)
 #if MYNEWT_VAL(BLE_LL_CFG_FEAT_LL_PRIVACY)
     int adva_offset;
 #endif
+
+    little_trace_void(TR_RX_START_ISR);
+
 
     dptr = (uint8_t *)&g_ble_phy_rx_buf[0];
 
@@ -1466,6 +1564,8 @@ ble_phy_isr(void)
     uint32_t irq_en;
 
     os_trace_isr_enter();
+    
+    little_trace_void(TR_PHY_ISR);
 
     /* Read irq register to determine which interrupts are enabled */
     irq_en = NRF_RADIO->INTENSET;
@@ -1820,7 +1920,7 @@ ble_phy_tx_set_start_time(uint32_t cputime, uint8_t rem_usecs)
 {
     int rc;
 
-    ble_phy_trace_u32x2(BLE_PHY_TRACE_ID_START_TX, cputime, rem_usecs);
+    ble_phy_trace_u32x2(TR_TX_SET_START_TIME, cputime, rem_usecs);
 
 #if MYNEWT_VAL(BLE_LL_PHY)
     ble_phy_mode_apply(g_ble_phy_data.phy_tx_phy_mode);
@@ -1862,7 +1962,7 @@ ble_phy_rx_set_start_time(uint32_t cputime, uint8_t rem_usecs)
     bool late = false;
     int rc = 0;
 
-    ble_phy_trace_u32x2(BLE_PHY_TRACE_ID_START_RX, cputime, rem_usecs);
+    ble_phy_trace_u32x2(TR_RX_SET_START_TIME, cputime, rem_usecs);
 
 #if MYNEWT_VAL(BLE_LL_PHY)
     ble_phy_mode_apply(g_ble_phy_data.phy_rx_phy_mode);
@@ -1886,12 +1986,23 @@ ble_phy_rx_set_start_time(uint32_t cputime, uint8_t rem_usecs)
 
     /* Start rx */
     rc = ble_phy_rx();
+    
+    if (rc) {
+        PBL_LOG(LOG_LEVEL_ERROR, "ble_phy_rx fault!");
+    }
+    
+    //if (!late) {
+        //if ((NRF_RTC0->COUNTER + 1) >= cputime) {
+            //PBL_LOG(LOG_LEVEL_ERROR, "*** I THINK WE MAY HAVE MISSED A RTC TICK, cc = %"PRIu32", counter=%"PRIu32", cputime=%"PRIu32"", NRF_RTC0->CC[0], NRF_RTC0->COUNTER, cputime);
+        //}
+    //}
 
     /*
      * If we enabled receiver but were late, let's return proper error code so
      * caller can handle this.
      */
     if (!rc && late) {
+        //PBL_LOG(LOG_LEVEL_ERROR, "ble_phy_rx late!");
         rc = BLE_PHY_ERR_RX_LATE;
     }
 
@@ -1911,7 +2022,9 @@ ble_phy_tx(ble_phy_tx_pducb_t pducb, void *pducb_arg, uint8_t end_trans)
 
     if (g_ble_phy_data.phy_transition_late) {
         ble_phy_disable();
+        little_trace_void(TR_TX_LATE);
         STATS_INC(ble_phy_stats, tx_late);
+        //PBL_LOG(LOG_LEVEL_ERROR, "ble_phy_tx late!");
         return BLE_PHY_ERR_TX_LATE;
     }
 
@@ -2005,10 +2118,12 @@ ble_phy_tx(ble_phy_tx_pducb_t pducb, void *pducb_arg, uint8_t end_trans)
         STATS_INC(ble_phy_stats, tx_good);
         STATS_INCN(ble_phy_stats, tx_bytes, payload_len + BLE_LL_PDU_HDR_LEN);
         rc = BLE_ERR_SUCCESS;
+        little_trace_void(TR_TX_START_OK);
     } else {
         ble_phy_disable();
         STATS_INC(ble_phy_stats, tx_late);
         rc = BLE_PHY_ERR_RADIO_STATE;
+        little_trace_void(TR_TX_START_BAD);
     }
 
     return rc;

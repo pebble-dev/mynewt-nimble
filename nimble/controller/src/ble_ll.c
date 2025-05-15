@@ -830,6 +830,7 @@ ble_ll_wfr_timer_exp(void *arg)
  *
  */
 #if MYNEWT_VAL(BLE_LL_ROLE_CENTRAL) || MYNEWT_VAL(BLE_LL_ROLE_PERIPHERAL)
+#include <hal/nrf_rtc.h>
 static void
 ble_ll_tx_pkt_in(void)
 {
@@ -839,6 +840,12 @@ ble_ll_tx_pkt_in(void)
     struct os_mbuf_pkthdr *pkthdr;
     struct os_mbuf *om;
     os_sr_t sr;
+
+    extern bool ble_is_on_fire;
+    extern void print_tracebuf();
+    if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_tx_pkt_in");
+    if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "NRF_RTC0->CC[0] = %"PRIu32", NRF_RTC0->COUNTER = %"PRIu32"", NRF_RTC0->CC[0], NRF_RTC0->COUNTER);
+    if (ble_is_on_fire) print_tracebuf();
 
     /* Drain all packets off the queue */
     while (STAILQ_FIRST(&g_ble_ll_data.ll_tx_pkt_q)) {
@@ -866,6 +873,9 @@ ble_ll_tx_pkt_in(void)
         }
 
         /* Hand to connection state machine */
+        extern bool ble_is_on_fire;
+        if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_tx_pkt_in handing off packet with length %d", length);
+
         ble_ll_conn_tx_pkt_in(om, handle, length);
     }
 }
@@ -1034,6 +1044,8 @@ ble_ll_acl_data_in(struct os_mbuf *txpkt)
     os_sr_t sr;
     struct os_mbuf_pkthdr *pkthdr;
 
+extern bool ble_is_on_fire;
+if (ble_is_on_fire) PBL_LOG(LOG_LEVEL_ERROR, "enqueue ACL packet");
     pkthdr = OS_MBUF_PKTHDR(txpkt);
     OS_ENTER_CRITICAL(sr);
     STAILQ_INSERT_TAIL(&g_ble_ll_data.ll_tx_pkt_q, pkthdr, omp_next);

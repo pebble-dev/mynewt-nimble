@@ -375,6 +375,7 @@ ble_ll_sched_conn_reschedule(struct ble_ll_conn_sm *connsm)
 
     /* Better be past current time or we just leave */
     if (LL_TMR_LT(sch->start_time, ble_ll_tmr_get())) {
+     PBL_LOG(LOG_LEVEL_ERROR, "ble_ll_sched_conn_reschedule too late?");
         return -1;
     }
 

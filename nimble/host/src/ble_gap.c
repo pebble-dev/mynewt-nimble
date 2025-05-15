@@ -1350,6 +1350,7 @@ ble_gap_rx_update_complete(const struct ble_hci_ev_le_subev_conn_upd_complete *e
 
     conn_handle = le16toh(ev->conn_handle);
 
+    BLE_HS_LOG(INFO, "*** ble_gap_rx_update_complete: ev->status = %d, ev->conn_itvl = %d", ev->status, le16toh(ev->conn_itvl));
     conn = ble_hs_conn_find(conn_handle);
     if (conn != NULL) {
         switch (ev->status) {

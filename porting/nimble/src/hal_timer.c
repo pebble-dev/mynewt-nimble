@@ -133,6 +133,8 @@ nrf_read_timer_cntr(NRF_TIMER_Type *hwtimer)
     return tcntr;
 }
 
+extern void little_trace_u32x2(uint32_t a, uint32_t b, uint32_t c);
+
 /**
  * nrf timer set ocmp
  *
@@ -162,6 +164,8 @@ nrf_timer_set_ocmp(struct nrf52_hal_timer *bsptimer, uint32_t expiry)
         }
         temp |= cntr;
         delta_t = (int32_t)(expiry - temp);
+        
+        little_trace_u32x2(20000, temp, expiry);
 
         /*
          * The nRF52xxx documentation states that COMPARE event is guaranteed
@@ -385,6 +389,7 @@ hal_rtc_timer_irq_handler(struct nrf52_hal_timer *bsptimer)
 
     /* Count # of timer isrs */
     ++bsptimer->timer_isrs;
+    little_trace_u32x2(20001, rtctimer->COUNTER, rtctimer->CC[NRF_RTC_TIMER_CC_INT]);
 
     /*
      * NOTE: we dont check the 'compare' variable here due to how the timer
@@ -912,7 +917,7 @@ hal_timer_stop(struct hal_timer *timer)
 {
     os_sr_t sr;
     int reset_ocmp;
-    struct hal_timer *entry;
+    struct hal_timer *entry = NULL;
     struct nrf52_hal_timer *bsptimer;
 
     if (timer == NULL) {

@@ -48,6 +48,7 @@ syscfg.defs:
             - apollo3
             - uart_ll
             - custom
+            - sdc
 
     BLE_TRANSPORT_ACL_COUNT:
         description: >

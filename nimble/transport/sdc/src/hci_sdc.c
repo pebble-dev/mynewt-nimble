@@ -356,7 +356,6 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_TEST_END:
-          err = sdc_hci_cmd_le_test_end(data);
           break;
 
         case BLE_HCI_OCF_LE_REM_CONN_PARAM_RR:

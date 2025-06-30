@@ -27,7 +27,11 @@
 #include "nimble/transport.h"
 #include "sdc/sdc.h"
 #include "sdc/sdc_hci.h"
+#include "sdc/sdc_hci_cmd_controller_baseband.h"
+#include "sdc/sdc_hci_cmd_info_params.h"
 #include "sdc/sdc_hci_cmd_le.h"
+#include "sdc/sdc_hci_cmd_link_control.h"
+#include "sdc/sdc_hci_cmd_status_params.h"
 
 #define BLE_HCI_UART_H4_NONE 0x00
 #define BLE_HCI_UART_H4_CMD 0x01
@@ -127,11 +131,11 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
     case 0x01:
       switch (ocf) {
         case BLE_HCI_OCF_DISCONNECT_CMD:
-
+          err = sdc_hci_cmd_lc_disconnect(data);
           break;
 
         case BLE_HCI_OCF_RD_REM_VER_INFO:
-
+          err = sdc_hci_cmd_lc_read_remote_version_information(data);
           break;
 
         default:
@@ -151,35 +155,35 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_CB_RESET:
-
+          err = sdc_hci_cmd_cb_reset();
           break;
 
         case BLE_HCI_OCF_CB_READ_TX_PWR:
-
+          err = sdc_hci_cmd_cb_read_transmit_power_level(data, NULL);
           break;
 
         case BLE_HCI_OCF_CB_SET_CTLR_TO_HOST_FC:
-
+          err = sdc_hci_cmd_cb_set_controller_to_host_flow_control(data);
           break;
 
         case BLE_HCI_OCF_CB_HOST_BUF_SIZE:
-
+          err = sdc_hci_cmd_cb_host_buffer_size(data);
           break;
 
         case BLE_HCI_OCF_CB_HOST_NUM_COMP_PKTS:
-
+          err = sdc_hci_cmd_cb_host_number_of_completed_packets(data);
           break;
 
         case BLE_HCI_OCF_CB_SET_EVENT_MASK2:
-
+          err = sdc_hci_cmd_cb_set_event_mask_page_2(data);
           break;
 
         case BLE_HCI_OCF_CB_RD_AUTH_PYLD_TMO:
-
+          err = sdc_hci_cmd_cb_read_authenticated_payload_timeout(data, NULL);
           break;
 
         case BLE_HCI_OCF_CB_WR_AUTH_PYLD_TMO:
-
+          err = sdc_hci_cmd_cb_write_authenticated_payload_timeout(data, NULL);
           break;
 
         default:
@@ -191,15 +195,15 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
     case 0x04:
       switch (ocf) {
         case BLE_HCI_OCF_IP_RD_LOCAL_VER:
-
+          err = sdc_hci_cmd_ip_read_local_version_information(NULL);
           break;
 
         case BLE_HCI_OCF_IP_RD_LOC_SUPP_CMD:
-
+          err = sdc_hci_cmd_ip_read_local_supported_commands(NULL);
           break;
 
         case BLE_HCI_OCF_IP_RD_LOC_SUPP_FEAT:
-
+          err = sdc_hci_cmd_ip_read_local_supported_features(NULL);
           break;
 
         case BLE_HCI_OCF_IP_RD_BUF_SIZE:
@@ -207,7 +211,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_IP_RD_BD_ADDR:
-
+          err = sdc_hci_cmd_ip_read_bd_addr(NULL);
           break;
 
         default:
@@ -219,7 +223,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
     case 0x05:
       switch (ocf) {
         case BLE_HCI_OCF_RD_RSSI:
-
+          err = sdc_hci_cmd_sp_read_rssi(data, NULL);
           break;
 
         default:

@@ -704,7 +704,8 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_READ_REMOTE_TRANSMIT_POWER_LEVEL:
-          err = sdc_hci_cmd_le_read_remote_transmit_power_level(data, NULL) break;
+          err = sdc_hci_cmd_le_read_remote_transmit_power_level(data);
+          break;
 
         case BLE_HCI_OCF_LE_SET_PATH_LOSS_REPORT_PARAM:
           err = sdc_hci_cmd_le_set_path_loss_reporting_params(data, NULL);

@@ -118,14 +118,13 @@ int ble_transport_to_ll_acl_impl(struct os_mbuf *om) {
 int ble_transport_to_ll_cmd_impl(void *buf) {
   struct ble_hci_cmd *cmd = (struct ble_hci_cmd *)buf;
 
-  uint16_t opcode = cmd->opcode;
-  uint8_t ogf = opcode >> 10;
-  uint8_t ocf = opcode & 0x3FF;
+  opcode = le16toh(cmd->opcode);
+  uint8_t ogf = BLE_HCI_OGF(opcode);
+  uint8_t ocf = BLE_HCI_OCF(opcode);
 
-  uint8_t data_length = cmd->length;
   void *data = (void *)(cmd->data);
 
-  uint8_t err = 0;
+  uint8_t err = NRF_EOPNOTSUPP;
 
   switch (ogf) {
     case 0x01:
@@ -243,11 +242,11 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_RD_BUF_SIZE:
-          err = sdc_hci_cmd_le_read_buffer_size(data);
+          err = sdc_hci_cmd_le_read_buffer_size(NULL);
           break;
 
         case BLE_HCI_OCF_LE_RD_BUF_SIZE_V2:
-          err = sdc_hci_cmd_le_read_buffer_size(NULL); /*Output parameter here*/
+          err = sdc_hci_cmd_le_read_buffer_size_v2(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RD_LOC_SUPP_FEAT:
@@ -838,14 +837,15 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
         case BLE_HCI_OCF_VS_SET_LOCAL_IRK:
 
           break;
+        __animation_service_timer_schedule(long unsigned int)
 
-        case BLE_HCI_OCF_VS_SET_SCAN_CFG:
-
-          break;
-
-        default:
+            case BLE_HCI_OCF_VS_SET_SCAN_CFG:
 
           break;
+
+          default :
+
+              break;
       }
 
       break;
@@ -854,5 +854,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
 
       break;
   }
-  return -err;
+
+  ble_transport_free(buf);
+  return -((int)(err));
 }

@@ -156,12 +156,12 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
         break;
       
       case BLE_HCI_OCF_CB_RESET:
-
+          
         break;
 
       case BLE_HCI_OCF_CB_READ_TX_PWR:
 
-        break;
+        b eak;
 
       case BLE_HCI_OCF_CB_SET_CTLR_TO_HOST_FC:
 
@@ -251,111 +251,111 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_RD_BUF_SIZE_V2:
-
+            err = sdc_hci_cmd_le_read_buffer_size(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RD_LOC_SUPP_FEAT:
-
+            err = sdc_hci_cmd_le_read_local_supported_features(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_SET_RAND_ADDR:
-
+            err = sdc_hci_cmd_le_set_random_address(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_ADV_PARAMS:
-
+            err = sdc_hci_cmd_le_set_adv_params(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_ADV_CHAN_TXPWR:
-
+            err = sdc_hci_cmd_le_read_adv_physical_channel_tx_power(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_ADV_DATA:
-
+            err = sdc_hci_cmd_le_set_adv_data(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_SCAN_RSP_DATA:
-
+            err = sdc_hci_cmd_le_set_scan_response_data(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_ADV_ENABLE:
-
+            err = sdc_hci_cmd_le_set_adv_enable(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_SCAN_PARAMS:
-
+            err = sdc_hci_cmd_le_set_scan_params(data);
           break;
         
         case BLE_HCI_OCF_LE_SET_SCAN_ENABLE:
-
+            err = sdc_hci_cmd_le_set_scan_enable(data);
           break;
 
         case BLE_HCI_OCF_LE_CREATE_CONN:
-
+            err = sdc_hci_cmd_le_create_conn(data);
           break;
 
         case BLE_HCI_OCF_LE_CREATE_CONN_CANCEL:
-
+            err = sdc_hci_cmd_le_create_conn_cancel();
           break;
 
         case BLE_HCI_OCF_LE_RD_WHITE_LIST_SIZE:
-
+            err = sdc_hci_cmd_le_read_filter_accept_list_size(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_CLEAR_WHITE_LIST:
-
+            err = sdc_hci_cmd_le_clear_filter_accept_list();
           break;
 
         case BLE_HCI_OCF_LE_ADD_WHITE_LIST:
-
+            err = sdc_hci_cmd_le_add_device_to_filter_accept_list(data);
           break;
 
         case BLE_HCI_OCF_LE_RMV_WHITE_LIST:
-
+            err = sdc_hci_cmd_le_remove_device_from_filter_accept_list(data);
           break;
         
         case BLE_HCI_OCF_LE_CONN_UPDATE:
-
+            err = sdc_hci_cmd_le_conn_update(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_HOST_CHAN_CLASS:
-
+            err = sdc_hci_cmd_le_set_host_channel_classification(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_CHAN_MAP:
-
+            err = sdc_hci_cmd_le_read_channel_map(data, NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RD_REM_FEAT:
-
+            err = sdc_hci_cmd_le_read_remote_features(data);
           break;
       
         case BLE_HCI_OCF_LE_ENCRYPT:
-
+            err = sdc_hci_cmd_le_encrypt(data, NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RAND:
-
+            err = sdc_hci_cmd_le_rand(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_START_ENCRYPT:
-
+            err = sdc_hci_cmd_le_enable_encryption(data);
           break;
         
         case BLE_HCI_OCF_LE_LT_KEY_REQ_REPLY:
-
+            err = sdc_hci_cmd_le_long_term_key_request_reply(data, NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_LT_KEY_REQ_NEG_REPLY:
-
+            err = sdc_hci_cmd_le_long_term_key_request_negative_reply(data, NULL) /*Ouput parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RD_SUPP_STATES:
-
+            err = sdc_hci_cmd_le_read_supported_states(data);
           break;
 
         case BLE_HCI_OCF_LE_RX_TEST:
-
+            
           break;
 
         case BLE_HCI_OCF_LE_TX_TEST:
@@ -375,15 +375,15 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_SET_DATA_LEN:
-
+            err = sdc_hci_cmd_le_set_data_length(data, NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RD_SUGG_DEF_DATA_LEN:
-
+            err = sdc_hci_cmd_le_read_suggested_default_data_length(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_WR_SUGG_DEF_DATA_LEN:
-
+            err = sdc_hci_cmd_le_write_suggested_default_data_length(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_P256_PUBKEY:
@@ -395,19 +395,19 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_ADD_RESOLV_LIST:
-
+            err = sdc_hci_cmd_le_add_device_to_resolving_list(data);
           break;
 
         case BLE_HCI_OCF_LE_RMV_RESOLV_LIST:
-
+            err = sdc_hci_cmd_le_remove_device_from_resolving_list(data);
           break;
 
         case BLE_HCI_OCF_LE_CLR_RESOLV_LIST:
-
+            err = sdc_hci_cmd_le_clear_resolving_list();
           break;
 
         case BLE_HCI_OCF_LE_RD_RESOLV_LIST_SIZE:
-
+            err = sdc_hci_cmd_le_read_resolving_list_size(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_PEER_RESOLV_ADDR:
@@ -419,27 +419,27 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_SET_ADDR_RES_EN:
-
+            err = sdc_hci_cmd_le_set_address_resolution_enable(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_RPA_TMO:
-
+            err = sdc_hci_cmd_le_set_resolvable_private_address_timeout(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_MAX_DATA_LEN:
-
+            err = sdc_hci_cmd_le_read_max_data_length(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RD_PHY:
-
+           err = sdc_hci_cmd_le_read_phy(data, NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_SET_DEFAULT_PHY:
-
+            err = sdc_hci_cmd_le_set_default_phy(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_PHY:
-
+            err = sdc_hci_cmd_le_set_phy(data);
           break;
 
         case BLE_HCI_OCF_LE_RX_TEST_V2:
@@ -451,75 +451,75 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_SET_ADV_SET_RND_ADDR:
-
+            err = sdc_hci_cmd_le_set_adv_set_random_address(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_EXT_ADV_PARAM:
-
+            err = sdc_hci_cmd_le_set_ext_adv_params(data, NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_SET_EXT_ADV_DATA:
-
+            err = sdc_hci_cmd_le_set_ext_adv_data(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_EXT_SCAN_RSP_DATA:
-
+            err = sdc_hci_cmd_le_set_ext_scan_response_data(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_EXT_ADV_ENABLE:
-
+            err = sdc_hci_cmd_le_set_ext_adv_enable(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_MAX_ADV_DATA_LEN:
-
+            err = sdc_hci_cmd_le_read_max_adv_data_length(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_RD_NUM_OF_ADV_SETS:
-
+            err = sdc_hci_cmd_le_read_number_of_supported_adv_sets(NULL); /*Output parameter here*/
           break;
 
         case BLE_HCI_OCF_LE_REMOVE_ADV_SET:
-
+            err = sdc_hci_cmd_le_remove_adv_set(data);
           break;
         
         case BLE_HCI_OCF_LE_CLEAR_ADV_SETS:
-
+            err = sdc_hci_cmd_le_clear_adv_sets();
           break;
 
         case BLE_HCI_OCF_LE_SET_PERIODIC_ADV_PARAMS:
-
+            err = sdc_hci_cmd_le_set_periodic_adv_params(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_PERIODIC_ADV_DATA:
-
+            err = sdc_hci_cmd_le_set_periodic_adv_data(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_PERIODIC_ADV_ENABLE:
-
+            err = sdc_hci_cmd_le_set_periodic_adv_enable(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_EXT_SCAN_PARAM:
-
+            err = sdc_hci_cmd_le_set_ext_scan_params(data);
           break;
 
         case BLE_HCI_OCF_LE_SET_EXT_SCAN_ENABLE:
-
+            err = sdc_hci_cmd_le_set_ext_scan_enable(data);
           break;
 
         case BLE_HCI_OCF_LE_EXT_CREATE_CONN:
-
+            err = sdc_hci_cmd_le_ext_create_conn(data);
           break;
 
         case BLE_HCI_OCF_LE_PERIODIC_ADV_CREATE_SYNC:
-
+            err = sdc_hci_cmd_le_periodic_adv_create_sync(data);
           break;
 
         case BLE_HCI_OCF_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL:
-
+            err = sdc_hci_cmd_le_periodic_adv_create_sync_cancel();
           break;
 
         case BLE_HCI_OCF_LE_PERIODIC_ADV_TERM_SYNC:
-
+            err = sdc_hci_cmd_le_periodic_adv_terminate_sync(data);
           break;
 
         case BLE_HCI_OCF_LE_ADD_DEV_TO_PERIODIC_ADV_LIST:

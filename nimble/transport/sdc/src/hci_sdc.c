@@ -676,7 +676,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_ISO_TRANSMIT_TEST:
-
+          err = sdc_hci_cmd_le_iso_transmit_test(data, NULL);
           break;
 
         case BLE_HCI_OCF_LE_ISO_RECEIVE_TEST:
@@ -684,7 +684,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_ISO_READ_TEST_COUNTERS:
-
+          err = sdc_hci_cmd_le_iso_read_test_counters(data, NULL);
           break;
 
         case BLE_HCI_OCF_LE_ISO_TEST_END:
@@ -692,11 +692,11 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_SET_HOST_FEATURE:
-
+          err = sdc_hci_cmd_le_set_host_feature(data);
           break;
 
         case BLE_HCI_OCF_LE_READ_ISO_LINK_QUALITY:
-
+          err = sdc_hci_cmd_le_read_iso_link_quality(data, NULL);
           break;
 
         case BLE_HCI_OCF_LE_ENH_READ_TRANSMIT_POWER_LEVEL:
@@ -704,15 +704,14 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_READ_REMOTE_TRANSMIT_POWER_LEVEL:
-
-          break;
+          err = sdc_hci_cmd_le_read_remote_transmit_power_level(data, NULL) break;
 
         case BLE_HCI_OCF_LE_SET_PATH_LOSS_REPORT_PARAM:
           err = sdc_hci_cmd_le_set_path_loss_reporting_params(data, NULL);
           break;
 
         case BLE_HCI_OCF_LE_SET_PATH_LOSS_REPORT_ENABLE:
-
+          err = sdc_hci_cmd_le_set_path_loss_reporting_enable(data, NULL);
           break;
 
         case BLE_HCI_OCF_LE_SET_TRANS_PWR_REPORT_ENABLE:
@@ -784,7 +783,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_CS_TEST_END:
-
+          err = sdc_hci_cmd_le_cs_test_end();
           break;
 
         default:

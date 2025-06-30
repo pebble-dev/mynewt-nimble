@@ -235,11 +235,11 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
     case 0x08:
       switch (ocf) {
         case BLE_HCI_OCF_LE_SET_EVENT_MASK:
-
+          err = sdc_hci_cmd_le_set_event_mask(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_BUF_SIZE:
-
+          err = sdc_hci_cmd_le_read_buffer_size(data);
           break;
 
         case BLE_HCI_OCF_LE_RD_BUF_SIZE_V2:
@@ -356,7 +356,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_TEST_END:
-
+          err = sdc_hci_cmd_le_test_end(data);
           break;
 
         case BLE_HCI_OCF_LE_REM_CONN_PARAM_RR:
@@ -544,7 +544,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
           break;
 
         case BLE_HCI_OCF_LE_SET_PRIVACY_MODE:
-
+          err = sdc_hci_cmd_le_set_privacy_mode(data);
           break;
 
         case BLE_HCI_OCF_LE_RX_TEST_V3:
@@ -849,7 +849,7 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
 
     default:
 
-        break;
+      break;
   }
   return -err;
 }

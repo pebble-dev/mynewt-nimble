@@ -837,15 +837,14 @@ int ble_transport_to_ll_cmd_impl(void *buf) {
         case BLE_HCI_OCF_VS_SET_LOCAL_IRK:
 
           break;
-        __animation_service_timer_schedule(long unsigned int)
 
-            case BLE_HCI_OCF_VS_SET_SCAN_CFG:
+        case BLE_HCI_OCF_VS_SET_SCAN_CFG:
 
           break;
 
-          default :
+        default:
 
-              break;
+          break;
       }
 
       break;

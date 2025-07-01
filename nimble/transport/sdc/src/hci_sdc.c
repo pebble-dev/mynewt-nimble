@@ -118,7 +118,7 @@ int ble_transport_to_ll_acl_impl(struct os_mbuf *om) {
 int ble_transport_to_ll_cmd_impl(void *buf) {
   struct ble_hci_cmd *cmd = (struct ble_hci_cmd *)buf;
 
-  opcode = le16toh(cmd->opcode);
+  uint16_t opcode = le16toh(cmd->opcode);
   uint8_t ogf = BLE_HCI_OGF(opcode);
   uint8_t ocf = BLE_HCI_OCF(opcode);
 

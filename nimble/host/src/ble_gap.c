@@ -1996,6 +1996,7 @@ ble_gap_rx_subrate_change(const struct ble_hci_ev_le_subev_subrate_change *ev)
     event.subrate_change.supervision_tmo = le16toh(ev->supervision_tmo);
 
     ble_gap_event_listener_call(&event);
+    ble_gap_call_conn_event_cb(&event, ev->conn_handle);
 }
 #endif
 
@@ -2095,6 +2096,9 @@ ble_gap_rx_conn_complete(struct ble_gap_conn_complete *evt, uint8_t instance)
     /* We verified that there is a free connection when the procedure began. */
     conn = ble_hs_conn_alloc(evt->connection_handle);
     BLE_HS_DBG_ASSERT(conn != NULL);
+    if (conn == NULL) {
+        return BLE_HS_ENOMEM;
+    }
 
     conn->bhc_itvl = evt->conn_itvl;
     conn->bhc_latency = evt->conn_latency;
@@ -2411,7 +2415,8 @@ ble_gap_wl_tx_add(const ble_addr_t *addr)
 {
     struct ble_hci_le_add_whte_list_cp cmd;
 
-    if (addr->type > BLE_ADDR_RANDOM) {
+    if (addr->type > BLE_ADDR_RANDOM &&
+        addr->type != BLE_ADDR_ANONYMOUS) {
         return BLE_HS_EINVAL;
     }
 
@@ -2466,7 +2471,8 @@ ble_gap_wl_set(const ble_addr_t *addrs, uint8_t white_list_count)
 
     for (i = 0; i < white_list_count; i++) {
         if (addrs[i].type != BLE_ADDR_PUBLIC &&
-            addrs[i].type != BLE_ADDR_RANDOM) {
+            addrs[i].type != BLE_ADDR_RANDOM &&
+            addrs[i].type != BLE_ADDR_ANONYMOUS) {
 
             rc = BLE_HS_EINVAL;
             goto done;

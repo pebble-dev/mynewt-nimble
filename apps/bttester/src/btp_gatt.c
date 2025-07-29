@@ -95,7 +95,7 @@ struct find_attr_data {
 
 struct notify_mult_cb_data {
     size_t tuple_cnt;
-    uint16_t handles[0];
+    uint16_t handles[8];
 };
 
 static int
@@ -355,14 +355,13 @@ gatt_svr_read_write_test(uint16_t conn_handle, uint16_t attr_handle,
     case PTS_CHR_NOTIFY:
     case PTS_CHR_NOTIFY_ALT:
         if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_short_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_short_val),
                                     &gatt_svr_pts_static_short_val, NULL);
             return rc;
         } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_short_val,
-                                sizeof gatt_svr_pts_static_short_val);
+                                sizeof(gatt_svr_pts_static_short_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
     default:
@@ -386,14 +385,13 @@ gatt_svr_read_write_long_test(uint16_t conn_handle, uint16_t attr_handle,
     case PTS_LONG_CHR_READ_WRITE:
     case PTS_LONG_CHR_READ_WRITE_ALT:
         if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_long_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_long_val),
                                     &gatt_svr_pts_static_long_val, NULL);
             return rc;
         } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_long_val,
-                                sizeof gatt_svr_pts_static_long_val);
+                                sizeof(gatt_svr_pts_static_long_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
     default:
@@ -416,14 +414,13 @@ gatt_svr_read_write_auth_test(uint16_t conn_handle, uint16_t attr_handle,
     switch (uuid16) {
     case PTS_CHR_READ_WRITE_AUTHEN:
         if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_val),
                                     &gatt_svr_pts_static_val, NULL);
             return rc;
         } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_val,
-                                sizeof gatt_svr_pts_static_val);
+                                sizeof(gatt_svr_pts_static_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
     default:
@@ -470,12 +467,11 @@ gatt_svr_read_write_enc_test(uint16_t conn_handle, uint16_t attr_handle,
     case PTS_CHR_READ_WRITE_ENC:
         if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_val,
-                                sizeof gatt_svr_pts_static_val);
+                                sizeof(gatt_svr_pts_static_val));
             return rc;
         } else if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_val),
                                     &gatt_svr_pts_static_val, NULL);
             return rc;
         }
@@ -499,14 +495,13 @@ gatt_svr_dsc_read_write_test(uint16_t conn_handle, uint16_t attr_handle,
     switch (uuid16) {
     case PTS_DSC_READ_WRITE:
         if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_DSC) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_short_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_short_val),
                                     &gatt_svr_pts_static_short_val, NULL);
             return rc;
         } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_DSC) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_short_val,
-                                sizeof gatt_svr_pts_static_short_val);
+                                sizeof(gatt_svr_pts_static_short_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
     default:
@@ -529,14 +524,13 @@ gatt_svr_dsc_read_write_long_test(uint16_t conn_handle, uint16_t attr_handle,
     switch (uuid16) {
     case PTS_LONG_DSC_READ_WRITE:
         if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_DSC) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_long_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_long_val),
                                     &gatt_svr_pts_static_long_val, NULL);
             return rc;
         } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_DSC) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_long_val,
-                                sizeof gatt_svr_pts_static_long_val);
+                                sizeof(gatt_svr_pts_static_long_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
     default:
@@ -560,7 +554,7 @@ gatt_svr_dsc_read_test(uint16_t conn_handle, uint16_t attr_handle,
     case PTS_DSC_READ:
         if (ctxt->op == BLE_GATT_ACCESS_OP_READ_DSC) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_long_val,
-                                sizeof gatt_svr_pts_static_long_val);
+                                sizeof(gatt_svr_pts_static_long_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
     default:
@@ -583,14 +577,13 @@ gatt_svr_write_no_rsp_test(uint16_t conn_handle, uint16_t attr_handle,
     switch (uuid16) {
     case PTS_CHR_WRITE_NO_RSP:
         if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_short_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_short_val),
                                     &gatt_svr_pts_static_short_val, NULL);
             return rc;
         } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {
             rc = os_mbuf_append(ctxt->om, &gatt_svr_pts_static_short_val,
-                                sizeof gatt_svr_pts_static_short_val);
+                                sizeof(gatt_svr_pts_static_short_val));
             return rc == 0 ? 0 : BLE_ATT_ERR_INSUFFICIENT_RES;
         }
     default:
@@ -613,9 +606,8 @@ gatt_svr_rel_write_test(uint16_t conn_handle, uint16_t attr_handle,
     switch (uuid16) {
     case PTS_CHR_RELIABLE_WRITE:
         if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
-            rc = gatt_svr_chr_write(conn_handle, attr_handle,
-                                    ctxt->om, 0,
-                                    sizeof gatt_svr_pts_static_val,
+            rc = gatt_svr_chr_write(conn_handle, attr_handle, ctxt->om, 0,
+                                    sizeof(gatt_svr_pts_static_val),
                                     &gatt_svr_pts_static_val, NULL);
             return rc;
         }
@@ -1908,44 +1900,33 @@ notify_multiple(uint16_t conn_handle, void *arg)
 }
 
 static uint8_t
-set_mult(const void *cmd, uint16_t cmd_len,
-         void *rsp, uint16_t *rsp_len)
+notify_mult(const void *cmd, uint16_t cmd_len,
+            void *rsp, uint16_t *rsp_len)
 {
-    const struct btp_gatt_set_mult_val_cmd *cp = cmd;
-    struct ble_gatt_notif tuples[16];
-    int i;
-    int rc = 0;
-    int data_idx = 0;
-    uint16_t data_len;
+    const struct btp_gatt_notify_mult_val_cmd *cp = cmd;
     struct notify_mult_cb_data cb_data;
+    int i;
 
-    for (i = 0; i < cp->count; i++) {
-        tuples[i].handle = get_le16(cp->data + data_idx);
-        data_idx += 2;
-        tuples[i].value = ble_hs_mbuf_att_pkt();
-        if (tuples[i].value == NULL) {
-            rc = ENOMEM;
-            goto done;
-        }
 
-        data_len = get_le16(cp->data + data_idx);
-        data_idx += 2;
+    if (cmd_len < sizeof(*cp) ||
+        (cmd_len != (sizeof(*cp) +
+        (le16toh(cp->count) * sizeof(cp->handles[0]))))) {
 
-        os_mbuf_append(tuples[i].value, cp->data + data_idx, data_len);
-        data_idx += data_len;
+        return BTP_STATUS_FAILED;
+    }
+
+    if (le16toh(cp->count) > sizeof(cb_data.handles)) {
+        SYS_LOG_ERR("Too many handles to notify");
+        return BTP_STATUS_FAILED;
     }
 
     for (i = 0; i < cp->count; i++) {
-        ble_att_svr_write_local(tuples[i].handle, tuples[i].value);
-        cb_data.handles[i] = tuples[i].handle;
+        cb_data.handles[i] = le16toh(cp->handles[i]);
     }
 
     cb_data.tuple_cnt = cp->count;
+
     ble_gap_conn_foreach_handle(notify_multiple, (void *)&cb_data);
-done:
-    if (rc != 0) {
-        return BTP_STATUS_FAILED;
-    }
 
     return BTP_STATUS_SUCCESS;
 }
@@ -1971,38 +1952,8 @@ supported_commands(const void *cmd, uint16_t cmd_len,
 {
     struct btp_gatt_read_supported_commands_rp *rp = rsp;
 
-    /* octet 0 */
-    tester_set_bit(rp->data, BTP_GATT_READ_SUPPORTED_COMMANDS);
-    tester_set_bit(rp->data, BTP_GATT_START_SERVER);
-
-    /* octet 1 */
-    tester_set_bit(rp->data, BTP_GATT_EXCHANGE_MTU);
-    tester_set_bit(rp->data, BTP_GATT_DISC_ALL_PRIM_SVCS);
-    tester_set_bit(rp->data, BTP_GATT_DISC_PRIM_UUID);
-    tester_set_bit(rp->data, BTP_GATT_FIND_INCLUDED);
-    tester_set_bit(rp->data, BTP_GATT_DISC_ALL_CHRC);
-    tester_set_bit(rp->data, BTP_GATT_DISC_CHRC_UUID);
-
-    /* octet 2 */
-    tester_set_bit(rp->data, BTP_GATT_DISC_ALL_DESC);
-    tester_set_bit(rp->data, BTP_GATT_READ);
-    tester_set_bit(rp->data, BTP_GATT_READ_LONG);
-    tester_set_bit(rp->data, BTP_GATT_READ_MULTIPLE);
-    tester_set_bit(rp->data, BTP_GATT_WRITE_WITHOUT_RSP);
-#if 0
-    tester_set_bit(rp->data, BTP_GATT_SIGNED_WRITE_WITHOUT_RSP);
-#endif
-    tester_set_bit(rp->data, BTP_GATT_WRITE);
-
-    /* octet 3 */
-    tester_set_bit(rp->data, BTP_GATT_WRITE_LONG);
-    tester_set_bit(rp->data, BTP_GATT_CFG_NOTIFY);
-    tester_set_bit(rp->data, BTP_GATT_CFG_INDICATE);
-    tester_set_bit(rp->data, BTP_GATT_GET_ATTRIBUTES);
-    tester_set_bit(rp->data, BTP_GATT_GET_ATTRIBUTE_VALUE);
-    tester_set_bit(rp->data, BTP_GATT_CHANGE_DATABASE);
-
-    *rsp_len = sizeof(*rp) + 4;
+    *rsp_len = tester_supported_commands(BTP_SERVICE_ID_GATT, rp->data);
+    *rsp_len += sizeof(*rp);
 
     return BTP_STATUS_SUCCESS;
 }
@@ -2133,9 +2084,9 @@ static const struct btp_handler handlers[] = {
         .func = get_attr_val,
     },
     {
-        .opcode = BTP_GATT_SET_MULT_VALUE,
+        .opcode = BTP_GATT_NOTIFY_MULTIPLE,
         .expect_len = BTP_HANDLER_LENGTH_VARIABLE,
-        .func = set_mult,
+        .func = notify_mult,
     },
 };
 
